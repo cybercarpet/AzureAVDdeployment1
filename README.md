@@ -6,20 +6,20 @@ This project provides a fully automated deployment of Azure Virtual Desktop (AVD
 
 Features
 
-✅ Infrastructure as Code (IaC) with Terraform✅ CI/CD Pipeline for automated deployment via Azure DevOps✅ Auto-Scaling based on session usage✅ Monitoring Alerts for CPU & Memory thresholds✅ Auto-Shutdown to reduce costs
+✅ Infrastructure as Code (IaC) with Terraform
+✅ CI/CD Pipeline for automated deployment via Azure DevOps
+✅ Auto-Scaling based on session usage
+✅ Monitoring Alerts for CPU & Memory thresholds
+✅ Auto-Shutdown to reduce costs
 
 Prerequisites
 
 Before deploying this project, ensure you have the following:
 
 Azure Subscription (Pay-As-You-Go or Free Trial)
-
 Azure Service Connection configured in Azure DevOps
-
 Terraform CLI installed (if running locally)
-
 Azure CLI installed
-
 GitHub Repository (for version control)
 
 Deployment Steps
