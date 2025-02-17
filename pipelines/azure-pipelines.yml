@@ -1,0 +1,62 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: 'Your-Azure-Service-Connection'
+  resourceGroupName: 'avd-resource-group'
+  location: 'Central Europe'
+
+stages:
+- stage: Terraform_Deployment
+  displayName: 'Deploy AVD Infrastructure'
+  jobs:
+  - job: Terraform
+    displayName: 'Run Terraform Commands'
+    steps:
+    - task: TerraformInstaller@0
+      inputs:
+        terraformVersion: 'latest'
+    
+    - script: |
+        terraform init
+      displayName: 'Terraform Init'
+
+    - script: |
+        terraform plan -out=tfplan
+      displayName: 'Terraform Plan'
+
+    - script: |
+        terraform apply -auto-approve tfplan
+      displayName: 'Terraform Apply'
+
+- stage: Monitoring_Setup
+  displayName: 'Configure Monitoring & Alerts'
+  dependsOn: Terraform_Deployment
+  jobs:
+  - job: SetupMonitoring
+    displayName: 'Create Monitoring Rules'
+    steps:
+    - script: |
+        az monitor metrics alert create \
+          --name 'HighCPUAlert' \
+          --resource-group $(resourceGroupName) \
+          --scopes $(resourceGroupName) \
+          --condition "avg Percentage CPU > 80" \
+          --window-size 5m \
+          --evaluation-frequency 1m \
+          --action-group 'avd-action-group'
+      displayName: 'Setup CPU Alert'
+
+    - script: |
+        az monitor metrics alert create \
+          --name 'LowMemoryAlert' \
+          --resource-group $(resourceGroupName) \
+          --scopes $(resourceGroupName) \
+          --condition "avg Available Memory < 25%" \
+          --window-size 5m \
+          --evaluation-frequency 1m \
+          --action-group 'avd-action-group'
+      displayName: 'Setup Memory Alert'
